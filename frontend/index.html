@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NewsAI — Intelligent News Aggregator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <a class="logo" href="#">
+    <div class="logo-icon">📰</div>
+    <div class="logo-name">News<span>AI</span></div>
+  </a>
+  <div class="header-right">
+    <button class="ai-checker-btn" onclick="openAIChecker()" title="Check any headline with AI">🤖 AI Checker</button>
+    <div class="ai-badge">⚡ AI Verified</div>
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search news..." id="searchInput" oninput="filterSearch()" onkeydown="handleSearchKey(event)"/>
+    </div>
+  </div>
+</header>
+
+<!-- BREAKING NEWS TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-label">LIVE</div>
+  <div class="ticker-track" id="ticker">
+    <span class="ticker-item"><span class="ticker-dot"></span>AI model surpasses human performance on medical diagnosis benchmarks</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Government launches new digital infrastructure scheme for rural India</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Scientists discover new approach to quantum error correction</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Global health summit addresses antibiotic resistance crisis</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Tech giants collaborate on open-source AI safety framework</span>
+    <!-- duplicate for seamless loop -->
+    <span class="ticker-item"><span class="ticker-dot"></span>AI model surpasses human performance on medical diagnosis benchmarks</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Government launches new digital infrastructure scheme for rural India</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Scientists discover new approach to quantum error correction</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Global health summit addresses antibiotic resistance crisis</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Tech giants collaborate on open-source AI safety framework</span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-icon">📡</div>
+      <div>
+        <div class="stat-num">1,240</div>
+        <div class="stat-label">Sources monitored</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🛡️</div>
+      <div>
+        <div class="stat-num">98.2%</div>
+        <div class="stat-label">Verification accuracy</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🔥</div>
+      <div>
+        <div class="stat-num">8,400</div>
+        <div class="stat-label">Articles today</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🚫</div>
+      <div>
+        <div class="stat-num">342</div>
+        <div class="stat-label">Fake news flagged</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION HEADER -->
+  <div class="section-head">
+    <h1 class="section-title">Today's <em>Intelligence</em></h1>
+    <span class="section-sub">AI-verified · Updated 2 min ago</span>
+  </div>
+
+  <!-- FEATURED CARD -->
+  <div class="featured-card cat-technology">
+    <div class="featured-content">
+      <div>
+        <div class="featured-tag">⭐ Featured Story</div>
+        <h2 class="featured-title">India's AI Mission Targets 500K Skilled Professionals by 2026</h2>
+        <p class="featured-desc">The Ministry of Electronics & IT has announced an ambitious expansion of the National AI Mission, partnering with IITs, IIMs, and leading tech firms to train half a million AI-ready professionals across tier-2 and tier-3 cities.</p>
+      </div>
+      <div class="featured-footer">
+        <div class="featured-cred">
+          <span style="width:8px;height:8px;background:#4ade80;border-radius:50%;display:inline-block;box-shadow:0 0 6px #4ade80"></span>
+          AI Verified · High Credibility
+        </div>
+        <button class="read-btn">Read Full Story →</button>
+      </div>
+    </div>
+    <div class="featured-img">🤖</div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters">
+    <button class="filter-btn active" onclick="filterCat('all', this)">All News</button>
+    <button class="filter-btn" onclick="filterCat('technology', this)">🖥 Technology</button>
+    <button class="filter-btn" onclick="filterCat('health', this)">🩺 Health</button>
+    <button class="filter-btn" onclick="filterCat('politics', this)">🏛 Politics</button>
+    <button class="filter-btn" onclick="filterCat('science', this)">🔬 Science</button>
+    <button class="filter-btn" onclick="filterCat('economy', this)">📈 Economy</button>
+    <button class="filter-btn" onclick="filterCat('world', this)">🌍 World</button>
+  </div>
+
+  <!-- CARDS GRID -->
+  <div class="cards-grid" id="cardsGrid"></div>
+
+</main>
+
+<!-- AI CHECKER MODAL -->
+<div id="aiCheckerModal" class="modal">
+  <div class="modal-content advanced-modal">
+    <div class="modal-header advanced-header">
+      <h2>🤖 Advanced AI Credibility Analyzer</h2>
+      <button class="modal-close" onclick="closeAIChecker()">×</button>
+    </div>
+    
+    <div class="modal-tabs">
+      <button class="tab-btn active" data-mode="deep" onclick="switchMode('deep')">🔍 Deep Analysis</button>
+      <button class="tab-btn" data-mode="factcheck" onclick="switchMode('factcheck')">✓ Fact-Check</button>
+      <button class="tab-btn" data-mode="compare" onclick="switchMode('compare')">⚖️ Compare</button>
+    </div>
+
+    <div class="modal-body advanced-body">
+      
+      <!-- SINGLE ANALYSIS MODE -->
+      <div id="singleAnalysisMode" class="analysis-mode active">
+        <div class="modal-section">
+          <label for="checkerInput">Paste headline or news text:</label>
+          <textarea 
+            id="checkerInput" 
+            class="checker-textarea" 
+            placeholder="Paste your headline or news text here..." 
+            rows="4"
+            maxlength="5000"
+          ></textarea>
+          <div class="char-count"><span id="charCount">0</span>/5000</div>
+
+          <label for="checkerImageInput" style="margin-top: 18px; display:block;">Upload image for OCR analysis:</label>
+          <input id="checkerImageInput" class="file-input" type="file" accept="image/*" onchange="handleImageUpload(event)" />
+          <div id="imagePreviewWrapper" class="image-preview" style="display:none;">
+            <img id="imagePreview" alt="Uploaded image preview" />
+            <div class="image-info" id="imageInfo"></div>
+          </div>
+          <div id="imageExtractedText" class="extracted-text" style="display:none;"></div>
+
+          <div class="mode-info" id="modeInfo">
+            <span id="modeDescription">🔍 AI-powered analysis using Gemini</span>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button class="checker-submit-btn primary" onclick="analyzeHeadline()" id="analyzeBtn">
+            <span>Analyze</span>
+          </button>
+          <button class="checker-submit-btn secondary" onclick="resetChecker()">Clear</button>
+        </div>
+
+        <!-- RESULTS SECTION -->
+        <div id="checkerResults" class="checker-results advanced-results" style="display: none;">
+          
+          <!-- Main Score Section -->
+          <div class="results-main">
+            <div class="score-section">
+              <div class="score-circle" id="scoreCircle">
+                <div class="score-value" id="resultScore">0%</div>
+                <div class="score-label" id="resultStatus"></div>
+              </div>
+              <div class="score-details">
+                <h3>Overall Assessment</h3>
+                <p id="resultSummary" class="result-reason"></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Key Findings Section -->
+          <div class="findings-section">
+            <h4>🔑 Key Findings</h4>
+            <ul id="keyFindingsList" class="findings-list">
+              <li>No findings yet</li>
+            </ul>
+          </div>
+
+          <!-- Red Flags Section -->
+          <div class="flags-section" id="redFlagsSection" style="display: none;">
+            <h4 style="color: var(--danger);">⚠️ Red Flags & Concerns</h4>
+            <ul id="redFlagsList" class="flags-list">
+              <li>No red flags</li>
+            </ul>
+          </div>
+
+          <!-- Strengths Section -->
+          <div class="strengths-section" id="strengthsSection" style="display: none;">
+            <h4 style="color: var(--safe);">✓ Strengths & Credible Aspects</h4>
+            <ul id="strengthsList" class="strengths-list">
+              <li>No strengths identified</li>
+            </ul>
+          </div>
+
+          <!-- Detailed Analysis Metrics -->
+          <div class="metrics-section" id="metricsSection" style="display: none;">
+            <h4>📊 Detailed Analysis Metrics</h4>
+            <div class="metrics-grid">
+              <div class="metric-item">
+                <div class="metric-label">Source Reliability</div>
+                <div class="metric-bar">
+                  <div class="metric-fill" id="metricSourceReliability" style="width: 50%"></div>
+                </div>
+                <div class="metric-value" id="metricSourceReliabilityVal">50%</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-label">Factual Accuracy</div>
+                <div class="metric-bar">
+                  <div class="metric-fill" id="metricFactualAccuracy" style="width: 50%"></div>
+                </div>
+                <div class="metric-value" id="metricFactualAccuracyVal">50%</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-label">Bias Level</div>
+                <div class="metric-bar">
+                  <div class="metric-fill" id="metricBiasLevel" style="width: 50%"></div>
+                </div>
+                <div class="metric-value" id="metricBiasLevelVal">50%</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-label">Logical Consistency</div>
+                <div class="metric-bar">
+                  <div class="metric-fill" id="metricLogicalConsistency" style="width: 50%"></div>
+                </div>
+                <div class="metric-value" id="metricLogicalConsistencyVal">50%</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-label">Evidence Quality</div>
+                <div class="metric-bar">
+                  <div class="metric-fill" id="metricEvidenceQuality" style="width: 50%"></div>
+                </div>
+                <div class="metric-value" id="metricEvidenceQualityVal">50%</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recommendation Section -->
+          <div class="recommendation-section" id="recommendationSection" style="display: none;">
+            <h4>💡 Recommendation</h4>
+            <div class="recommendation-box" id="recommendationText"></div>
+          </div>
+
+          <div class="button-group">
+            <button class="checker-reset-btn" onclick="resetChecker()">Check Another</button>
+          </div>
+        </div>
+
+        <!-- ERROR STATE -->
+        <div id="checkerError" class="checker-error" style="display: none;"></div>
+
+        <!-- LOADING STATE -->
+        <div id="checkerLoading" class="checker-loading" style="display: none;">
+          <div class="spinner"></div>
+          <p id="loadingText">Analyzing with Gemini AI...</p>
+        </div>
+      </div>
+
+      <!-- COMPARISON MODE -->
+      <div id="comparisonMode" class="analysis-mode">
+        <div class="comparison-container">
+          <div class="comparison-section">
+            <h3>Headline 1</h3>
+            <textarea 
+              id="compareInput1" 
+              class="comparison-textarea" 
+              placeholder="Paste first headline..." 
+              maxlength="5000"
+            ></textarea>
+            <div class="char-count"><span id="charCount1">0</span>/5000</div>
+          </div>
+
+          <div class="comparison-vs">VS</div>
+
+          <div class="comparison-section">
+            <h3>Headline 2</h3>
+            <textarea 
+              id="compareInput2" 
+              class="comparison-textarea" 
+              placeholder="Paste second headline..." 
+              maxlength="5000"
+            ></textarea>
+            <div class="char-count"><span id="charCount2">0</span>/5000</div>
+          </div>
+        </div>
+
+        <button class="checker-submit-btn primary" onclick="compareHeadlines()" style="margin-top: 16px;">
+          <span>Compare Headlines</span>
+        </button>
+
+        <!-- COMPARISON RESULTS -->
+        <div id="comparisonResults" class="comparison-results" style="display: none;">
+          <div class="comparison-result-item">
+            <h4>Headline 1 Analysis</h4>
+            <div class="comparison-card" id="compResult1"></div>
+          </div>
+          <div class="comparison-result-item">
+            <h4>Headline 2 Analysis</h4>
+            <div class="comparison-card" id="compResult2"></div>
+          </div>
+          <div class="comparison-verdict">
+            <h4>Comparison Verdict</h4>
+            <div id="comparisonVerdict"></div>
+          </div>
+          <button class="checker-reset-btn" onclick="resetComparison()">Clear Comparison</button>
+        </div>
+
+        <div id="comparisonError" class="checker-error" style="display: none;"></div>
+        <div id="comparisonLoading" class="checker-loading" style="display: none;">
+          <div class="spinner"></div>
+          <p>Comparing headlines...</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer>
+  Built by <span>Alok Kumar Yadav</span> · Roll No 236002 · B.Tech CSE · St. Andrews Institute of Technology &amp; Management &nbsp;|&nbsp; Powered by <span>NewsAI</span>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+<script src="js/script.js"></script>
+</body>
+</html>
